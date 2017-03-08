@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,6 +58,16 @@ public class MainActivity extends AppCompatActivity {
         //externalStorage();
         //pmic();
 
+        ToggleButton toggle = (ToggleButton) findViewById(R.id.t_button);
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.d("Toggle", "toggle on");
+                } else {
+                    Log.d("Toggle", "toggle off");
+                }
+            }
+        });
     }
 
 
