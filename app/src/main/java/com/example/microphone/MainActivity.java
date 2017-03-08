@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             recorder.startRecording();
 
             Log.d(TAG, "pre loop");
-            //short[] a = new short[100];
+            short[] a = new short[AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT)];
             Log.d(TAG, Boolean.toString(recording));
             while (recording == true)
             {
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 //recorder.read(,buffer);
-                //recorder.read(MIC,44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT);
+                recorder.read(a,0,bufferSize);
 
                 //Log.d(TAG, Boolean.toString(recording));
 
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
             recorder.stop();
             Log.d(TAG, Boolean.toString(recording));
-
+            
             Log.d(TAG, "post loop");
             return;
 
