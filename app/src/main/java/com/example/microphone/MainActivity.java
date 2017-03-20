@@ -31,7 +31,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
@@ -39,6 +42,9 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -53,29 +59,14 @@ public class MainActivity extends AppCompatActivity {
     boolean pexstor;
     boolean pmicrophone = false;
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+    private String[] permissions = {Manifest.permission.RECORD_AUDIO};
     private final static String TAG = MainActivity.class.getName();
+    byte[] data;
 
 
     boolean recording;
     Runnable r = new MyRunnable();
     Thread t;
-
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case REQUEST_RECORD_AUDIO_PERMISSION:
-                pmicrophone  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                break;
-        }
-        if (!pmicrophone ) finish();
-
-    }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         //recording= false;
 
-        //externalStorage();
+        //writeToExternal();
         //pmic();
 
         ToggleButton toggle = (ToggleButton) findViewById(R.id.t_button);
@@ -112,9 +103,8 @@ public class MainActivity extends AppCompatActivity {
 
                     try {
                         t.join();
-                    }catch (Exception e)
-                    {
-
+                    } catch (Exception e) {
+                        //exception
                     }
                     //showWorking(false);
 
@@ -123,6 +113,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_RECORD_AUDIO_PERMISSION:
+                pmicrophone = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                if (!pmicrophone) {
+                    finish();
+                }
+                break;
+
+            case 1:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //externalStorage();
+                }
+                break;
+        }
+
+    }
+
+    public void writeToExternal() {
+        String[] perms = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        ActivityCompat.requestPermissions(this, perms, 1);
+    }
+
+
 
     /*
     private void showWorking(boolean on) {
@@ -139,8 +157,7 @@ public class MainActivity extends AppCompatActivity {
     }
     */
 
-    public void pmic()
-    {
+    public void pmic() {
         String[] perms = new String[]{Manifest.permission.RECORD_AUDIO};
 
         ActivityCompat.requestPermissions(this, perms, 1);
@@ -151,9 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
             pmicrophone = true;
 
-        }
-        else
-        {
+        } else {
             pmicrophone = false;
             Toast.makeText(this, "no mic", Toast.LENGTH_LONG).show();
         }
@@ -161,61 +176,67 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    class MyRunnable implements Runnable{
+    class MyRunnable implements Runnable {
 
 
         public void run() {
             int bufferSize = AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT);
 
-            AudioRecord recorder = new AudioRecord(MIC,44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT, bufferSize);
+            AudioRecord recorder = new AudioRecord(MIC, 44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT, bufferSize);
             recorder.startRecording();
 
             Log.d(TAG, "pre loop");
             short[] a = new short[AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT)];
             Log.d(TAG, Boolean.toString(recording));
-            while (recording == true)
-            {
-
+            while (recording == true) {
 
 
                 //recorder.read(,buffer);
-                recorder.read(a,0,bufferSize);
-
-                //Log.d(TAG, Boolean.toString(recording));
+                recorder.read(a, 0, bufferSize);
 
             }
 
             recorder.stop();
-            Log.d(TAG, Boolean.toString(recording));
-            
+
+            writeToExternal();
+
+            data = a.toString().getBytes();
+
             Log.d(TAG, "post loop");
+
             return;
 
         }
     }
 
 
+    public void externalStorage() {
+        Log.d(TAG, "start");
+        pexstor = true;
 
-    public void externalStorage()
-    {
-        String[] perms = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        File loc = getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+        loc.mkdirs();
 
-        ActivityCompat.requestPermissions(this, perms, 1);
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "writeable", Toast.LENGTH_LONG).show();
+        long time = System.currentTimeMillis()/1000;
+        String timestamp = Long.toString(time) + ".dat";
 
-            pexstor = true;
+        File f = new File(loc, timestamp);
+        FileOutputStream fos;
 
+        try {
+            fos = new FileOutputStream(f);
+            fos.write(data);
+            fos.close();
+            Log.d(TAG, "File written");
+
+        } catch (FileNotFoundException e1) {
+            Log.d(TAG, "File Not Found");
+        } catch (IOException e2) {
+            Log.d(TAG, "Error Writing!");
         }
-        else
-        {
-            pexstor = false;
-            Toast.makeText(this, "not writeable", Toast.LENGTH_LONG).show();
-        }
-
     }
+
+
 
 
 
@@ -237,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.menu_save:
+                externalStorage();
+                Toast.makeText(this, "Saving Audio...", Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_view:
                 break;
