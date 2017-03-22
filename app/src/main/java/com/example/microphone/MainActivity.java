@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
         file.mkdir();
         //File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), albumName);
 
-        long time = System.currentTimeMillis()/1000;
+        long time = System.currentTimeMillis()/10000;
         String timestamp = Long.toString(time) + ".pcm";
         Log.d(TAG, timestamp);
         //File f = new File(loc, timestamp);
@@ -330,7 +330,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu_view:
                 Intent i = new Intent(this, viewsaved.class);
-                i.putExtra("filenames", filenames);
                 startActivity(i);
                 break;
         }

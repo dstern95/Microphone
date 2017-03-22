@@ -28,10 +28,17 @@ public class viewsaved extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewsaved);
 
-        Intent i = getIntent();
-        ArrayList<String> filenames = i.getStringArrayListExtra("filenames");
+        //Intent i = getIntent();
+        //ArrayList<String> filenames = i.getStringArrayListExtra("filenames");
 
-        String[] fileArray = filenames.toArray(new String[filenames.size()]);
+        File loc = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "mic_recording_ds_md");
+        File[] files = loc.listFiles();
+
+        String[] fileArray = new String[files.length];
+
+        for (int i=0; i < fileArray.length; i++) {
+            fileArray[i] = files[i].getName();
+        }
 
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileArray);
 
