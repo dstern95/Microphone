@@ -6,7 +6,10 @@ import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +34,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,6 +47,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Random;
@@ -51,6 +56,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static android.media.AudioFormat.CHANNEL_IN_MONO;
 import static android.media.AudioFormat.ENCODING_PCM_16BIT;
+import static android.media.AudioFormat.ENCODING_PCM_8BIT;
 import static android.media.MediaRecorder.AudioSource.MIC;
 import static com.example.microphone.R.id.t_button;
 
@@ -63,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getName();
     byte[] data;
 
-
+    short[] d2;
     boolean recording;
     Runnable r = new MyRunnable();
     Thread t;
@@ -180,27 +186,52 @@ public class MainActivity extends AppCompatActivity {
 
 
         public void run() {
-            int bufferSize = AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT);
+            int bufferSize = AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT);
 
-            AudioRecord recorder = new AudioRecord(MIC, 44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT, bufferSize);
+            AudioRecord recorder = new AudioRecord(MIC, 44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT, bufferSize);
             recorder.startRecording();
 
             Log.d(TAG, "pre loop");
-            short[] a = new short[AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_16BIT)];
+            byte[] tmp = new byte[AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT)];
+            //byte[] a = new byte[bufferSize];
             Log.d(TAG, Boolean.toString(recording));
-            while (recording == true) {
+            int tot = 0;
+            ArrayList<byte[]> holder = new ArrayList<byte[]>();
+            ArrayList<Integer> h2 = new ArrayList<Integer>();
 
+            while (recording == true) {
+                int cur = 0;
 
                 //recorder.read(,buffer);
-                recorder.read(a, 0, bufferSize);
+                cur = recorder.read(tmp, 0, bufferSize);
+                holder.add(tmp);
+                h2.add(cur);
+                tot += cur;
 
             }
 
-            recorder.stop();
 
+
+            recorder.stop();
+            int place = 0;
+            byte[] a = new byte[tot];
+            for(int i=0; i<holder.size();i++)
+            {
+                byte[] tmp2;
+
+                tmp2 = holder.get(i);
+
+                for(int x=0; x<h2.size();x++)
+                {
+                    a[place] = tmp2[x];
+                    place++;
+                }
+            }
             writeToExternal();
 
-            data = a.toString().getBytes();
+            //d2 = a;
+            data = a;
+            //data = a.toString().getBytes();
 
             Log.d(TAG, "post loop");
 
@@ -214,16 +245,22 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "start");
         pexstor = true;
 
-        File loc = getExternalFilesDir(Environment.DIRECTORY_MUSIC);
-        loc.mkdirs();
+        //File loc = getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "mic_recording_ds_md");
+
+        //loc.mkdirs();
+        file.mkdir();
+        //File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), albumName);
 
         long time = System.currentTimeMillis()/1000;
-        String timestamp = Long.toString(time) + ".dat";
-
-        File f = new File(loc, timestamp);
+        String timestamp = Long.toString(time) + ".pcm";
+        Log.d(TAG, timestamp);
+        //File f = new File(loc, timestamp);
+        File f = new File(file, timestamp);
         FileOutputStream fos;
 
         try {
+
             fos = new FileOutputStream(f);
             fos.write(data);
             fos.close();
@@ -255,6 +292,8 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_play:
                 Toast.makeText(this, "Play", Toast.LENGTH_LONG).show();
+                playAudio(data);
+                //playMp3(data);
                 break;
 
             case R.id.menu_save:
@@ -267,13 +306,57 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+    public static void playAudio(byte[] data){
+        try{
+            Log.d("Audio","Playback enter");
+
+            Log.d("Audio",data.toString());
+            //AudioTrack audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100,
+              //      AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_8BIT, 500000, AudioTrack.MODE_STATIC);
+
+            //AudioTrack audioTrack = new AudioTrack()
+            Log.d("Audio",Integer.toString(data.length));
+            Log.d("Audio",Byte.toString(data[data.length/2]));
+            Log.d("Audio",Byte.toString(data[data.length/2+1]));
+            Log.d("Audio",Byte.toString(data[data.length/2+2]));
+            Log.d("Audio",Byte.toString(data[data.length/2+3]));
+
+
+            AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 44100,
+                    AudioFormat.CHANNEL_CONFIGURATION_MONO,AudioFormat.ENCODING_PCM_8BIT, data.length, AudioTrack.MODE_STATIC);
+            audioTrack.write(data, 0, data.length);
+
+            audioTrack.play();
+
+        } catch(Throwable t){
+            Log.d("Audio","Playback Failed");
+        }
+    }
 /*
-    private class record extends AsyncTask<Long, Integer, Long>
+    private void playMp3(byte[] mp3SoundByteArray)
     {
-        @Override
-        protected void onPreExcecute(){ showWorking(true)}
+        try
+        {
+            File path=new File(getCacheDir()+"/musicfile.3gp");
+
+            FileOutputStream fos = new FileOutputStream(path);
+            fos.write(mp3SoundByteArray);
+            fos.close();
 
 
+            MediaPlayer mediaPlayer = new MediaPlayer();
+
+            FileInputStream fis = new FileInputStream(path);
+            mediaPlayer.setDataSource(getCacheDir()+"/musicfile.3gp");
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        }
+        catch (IOException ex)
+        {
+            String s = ex.toString();
+            ex.printStackTrace();
+        }
     }
     */
 }
