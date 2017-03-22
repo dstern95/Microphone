@@ -55,7 +55,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static android.media.AudioFormat.CHANNEL_IN_MONO;
-import static android.media.AudioFormat.ENCODING_PCM_16BIT;
 import static android.media.AudioFormat.ENCODING_PCM_8BIT;
 import static android.media.MediaRecorder.AudioSource.MIC;
 import static com.example.microphone.R.id.t_button;
@@ -188,11 +187,13 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             int bufferSize = AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT);
 
+
             AudioRecord recorder = new AudioRecord(MIC, 44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT, bufferSize);
             recorder.startRecording();
 
             Log.d(TAG, "pre loop");
             byte[] tmp = new byte[AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT)];
+            //byte[] tmp = new byte[];
             //byte[] a = new byte[bufferSize];
             Log.d(TAG, Boolean.toString(recording));
             int tot = 0;
@@ -204,7 +205,11 @@ public class MainActivity extends AppCompatActivity {
 
                 //recorder.read(,buffer);
                 cur = recorder.read(tmp, 0, bufferSize);
+                Log.d("Write",Byte.toString(tmp[5]));
+
                 holder.add(tmp);
+
+
                 h2.add(cur);
                 tot += cur;
 
@@ -220,17 +225,35 @@ public class MainActivity extends AppCompatActivity {
                 byte[] tmp2;
 
                 tmp2 = holder.get(i);
+                //Log.d("Write",Byte.toString(tmp2[0]));
 
-                for(int x=0; x<h2.size();x++)
+
+                for(int x=0; x<h2.get(i);x++)
                 {
+                    //Log.d("Write",Byte.toString(tmp2[x]));
+                    //Log.d("Write",Integer.toString(place));
+
                     a[place] = tmp2[x];
                     place++;
                 }
+
+
             }
-            writeToExternal();
+            Log.d("Write",Integer.toString(place));
+
+            Log.d("Write",Integer.toString(a.length));
+
+            //writeToExternal();
 
             //d2 = a;
+            Log.d("Write",Byte.toString(a[a.length/2]));
+            Log.d("Write",Byte.toString(a[a.length/2+1]));
+            Log.d("Write",Byte.toString(a[a.length/2+2]));
+            Log.d("Write",Byte.toString(a[a.length/2+3]));
+
+
             data = a;
+
             //data = a.toString().getBytes();
 
             Log.d(TAG, "post loop");
