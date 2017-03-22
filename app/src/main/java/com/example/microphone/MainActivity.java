@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
     private final static String TAG = MainActivity.class.getName();
     byte[] data;
+
+    ArrayList<String> filenames = new ArrayList<String>();
 
     short[] d2;
     boolean recording;
@@ -289,6 +292,8 @@ public class MainActivity extends AppCompatActivity {
             fos.close();
             Log.d(TAG, "File written");
 
+            filenames.add(timestamp);
+
         } catch (FileNotFoundException e1) {
             Log.d(TAG, "File Not Found");
         } catch (IOException e2) {
@@ -324,6 +329,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Saving Audio...", Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_view:
+                Intent i = new Intent(this, viewsaved.class);
+                i.putExtra("filenames", filenames);
+                startActivity(i);
                 break;
         }
 
