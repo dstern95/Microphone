@@ -39,19 +39,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.Random;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -71,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> filenames = new ArrayList<String>();
     public AudioRecord recorder;
-    short[] d2;
     boolean recording;
     Runnable r = new MyRunnable();
     Thread t;
@@ -81,14 +70,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-
-
-        //recording= false;
-
-        //writeToExternal();
-        //pmic();
-
-
         ToggleButton toggle = (ToggleButton) findViewById(R.id.t_button);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -112,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
+
     }
 
     public void stoprecord(){
@@ -158,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
 
             case 1:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //externalStorage();
                 }
                 break;
         }
@@ -348,17 +331,6 @@ public class MainActivity extends AppCompatActivity {
     public static void playAudio(byte[] data){
         try{
             Log.d("Audio","Playback enter");
-
-            Log.d("Audio",data.toString());
-            //AudioTrack audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100,
-              //      AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_8BIT, 500000, AudioTrack.MODE_STATIC);
-
-            //AudioTrack audioTrack = new AudioTrack()
-            Log.d("Audio",Integer.toString(data.length));
-            Log.d("Audio",Byte.toString(data[data.length/2]));
-            Log.d("Audio",Byte.toString(data[data.length/2+1]));
-            Log.d("Audio",Byte.toString(data[data.length/2+2]));
-            Log.d("Audio",Byte.toString(data[data.length/2+3]));
 
 
             AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 8000,
