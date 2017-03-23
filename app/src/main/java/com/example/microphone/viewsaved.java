@@ -30,12 +30,11 @@ public class viewsaved extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewsaved);
 
-        //Intent i = getIntent();
-        //ArrayList<String> filenames = i.getStringArrayListExtra("filenames");
-
+        //get the directory where the files are saved
         File loc = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "mic_recording_ds_md");
         File[] files = loc.listFiles();
 
+        //If there are files in the directory
         if (files != null) {
             fileArray = new String[files.length];
 
@@ -47,11 +46,13 @@ public class viewsaved extends AppCompatActivity {
             fileArray = new String[0];
         }
 
+        //create an ArrayAdapter
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileArray);
 
         final ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(itemsAdapter);
 
+        //When an item is clicked
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -63,6 +64,7 @@ public class viewsaved extends AppCompatActivity {
 
     }
 
+    //read the bytes
     public void readFromExternal(String filename) {
         File loc = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "mic_recording_ds_md");
         loc.mkdirs();

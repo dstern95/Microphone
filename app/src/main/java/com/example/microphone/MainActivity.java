@@ -1,25 +1,15 @@
 package com.example.microphone;
 
 import android.Manifest;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.media.MediaPlayer;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,13 +20,10 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,20 +37,23 @@ import java.util.concurrent.locks.ReentrantLock;
 import static android.media.AudioFormat.CHANNEL_IN_MONO;
 import static android.media.AudioFormat.ENCODING_PCM_8BIT;
 import static android.media.MediaRecorder.AudioSource.MIC;
-import static com.example.microphone.R.id.t_button;
 
 public class MainActivity extends AppCompatActivity {
 
     boolean pexstor;
     boolean pmicrophone = false;
+
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
+
     private final static String TAG = MainActivity.class.getName();
+    
     byte[] data;
 
     ArrayList<String> filenames = new ArrayList<String>();
     public AudioRecord recorder;
     boolean recording;
+
     Runnable r = new MyRunnable();
     Thread t;
 
@@ -76,19 +66,23 @@ public class MainActivity extends AppCompatActivity {
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    //if the button is toggled then record
                     showWorking(true);
                     buttonView.setBackgroundResource(R.drawable.roundbuttonon);
+
                     int bufferSize = AudioRecord.getMinBufferSize(16000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT);
                     recorder = new AudioRecord(MIC, 8000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT, bufferSize);
+
                     Log.d("Toggle", "toggle on");
+
                     recording = true;
-                    //showWorking(true);
                     t = new Thread(r, "record");
                     t.start();
+
                     Log.d(TAG, "thread started");
 
-
                 } else {
+                    //stop recording if toggle is off
                     buttonView.setBackgroundResource(R.drawable.roundbutton);
                     stoprecord();
                 }
@@ -103,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void stoprecord(){
+
+        //makes sure recording thread stops
         Lock _mutex = new ReentrantLock(true);
 
         _mutex.lock();
@@ -125,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause()
     {
+        //toggles button off on pause
         super.onPause();
         ToggleButton toggle = (ToggleButton) findViewById(R.id.t_button);
         toggle.setChecked(false);
@@ -135,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //gets permissions
         switch (requestCode) {
             case REQUEST_RECORD_AUDIO_PERMISSION:
                 pmicrophone = grantResults[0] == PackageManager.PERMISSION_GRANTED;
@@ -152,14 +150,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void writeToExternal() {
+
         String[] perms = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
         ActivityCompat.requestPermissions(this, perms, 1);
     }
 
 
-
-
     private void showWorking(boolean on) {
+        //does an animation when the thread is running
         View v = findViewById(R.id.activity_fib_tv_recording);
         if (on) {
             v.setVisibility(View.VISIBLE);
@@ -171,45 +169,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    public void pmic() {
-        String[] perms = new String[]{Manifest.permission.RECORD_AUDIO};
-
-        ActivityCompat.requestPermissions(this, perms, 1);
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.RECORD_AUDIO)
-                == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "mic perm", Toast.LENGTH_LONG).show();
-
-            pmicrophone = true;
-
-        } else {
-            pmicrophone = false;
-            Toast.makeText(this, "no mic", Toast.LENGTH_LONG).show();
-        }
-
-
-    }
-
     class MyRunnable implements Runnable {
 
 
         public void run() {
-
+            //thread for microphone records in byte[]
             recorder.startRecording();
 
-            //byte[] tmp = new byte[AudioRecord.getMinBufferSize(8000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT)];
             byte[] tmp = new byte[8000];
-            //byte[] a = new byte[bufferSize];
             Log.d(TAG, "pre loop");
 
-            Log.d(TAG, Boolean.toString(recording));
+
+            ArrayList<Byte> bufferList = new ArrayList<Byte>();
 
 
-            ArrayList<Byte> h3 = new ArrayList<Byte>();
-
-
-            while (recording == true) {
+            while (recording) {
                 int cur = 0;
 
                 cur = recorder.read(tmp, 0, 8000);
@@ -219,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
                 for(int i =0;i< cur; i++)
                 {
-                    h3.add(tmp[i]);
+                    bufferList.add(tmp[i]);
                 }
 
 
@@ -230,39 +204,34 @@ public class MainActivity extends AppCompatActivity {
             recorder.stop();
             Log.d("Write","check");
 
-            //int place = 0;
-            byte[] a = new byte[h3.size()];
-            for(int i = 0; i<h3.size(); i++)
+            byte[] frecording = new byte[bufferList.size()];
+            for(int i = 0; i<bufferList.size(); i++)
             {
-                a[i] = h3.get(i);
+                frecording[i] = bufferList.get(i);
             }
 
-            Log.d("Write",Byte.toString(a[a.length/2]));
-            Log.d("Write",Byte.toString(a[a.length/2+1]));
-            Log.d("Write",Byte.toString(a[a.length/2+2]));
-            Log.d("Write",Byte.toString(a[a.length/2+3]));
 
-
-            data = a;
+            data = frecording;
             writeToExternal();
 
 
             Log.d(TAG, "post loop");
 
-            return;
+
 
         }
     }
 
 
     public void externalStorage() {
+
+        //writes the files to external storage with a timestamp
+
         Log.d(TAG, "start");
         pexstor = true;
 
-        //File loc = getExternalFilesDir(Environment.DIRECTORY_MUSIC);
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "mic_recording_ds_md");
 
-        //loc.mkdirs();
         file.mkdir();
         Timestamp time1 = new Timestamp(System.currentTimeMillis());
 
@@ -270,7 +239,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, timestamp);
 
 
-        //File f = new File(loc, timestamp);
         File f = new File(file, timestamp);
         FileOutputStream fos;
 
@@ -306,11 +274,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        //menu
         switch (item.getItemId()) {
             case R.id.menu_play:
                 Toast.makeText(this, "Play", Toast.LENGTH_LONG).show();
                 playAudio(data);
-                //playMp3(data);
                 break;
 
             case R.id.menu_save:
@@ -326,6 +294,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
     public static void playAudio(byte[] data){
+
+        //plays the audio
         try{
             Log.d("Audio","Playback enter");
 
