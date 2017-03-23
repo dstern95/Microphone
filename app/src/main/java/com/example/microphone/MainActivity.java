@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     byte[] data;
 
     ArrayList<String> filenames = new ArrayList<String>();
-
+    public AudioRecord recorder;
     short[] d2;
     boolean recording;
     Runnable r = new MyRunnable();
@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    int bufferSize = AudioRecord.getMinBufferSize(16000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT);
+                    recorder = new AudioRecord(MIC, 8000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT, bufferSize);
                     Log.d("Toggle", "toggle on");
                     recording = true;
                     //showWorking(true);
@@ -188,41 +190,56 @@ public class MainActivity extends AppCompatActivity {
 
 
         public void run() {
-            int bufferSize = AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT);
 
-
-            AudioRecord recorder = new AudioRecord(MIC, 44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT, bufferSize);
             recorder.startRecording();
 
-            Log.d(TAG, "pre loop");
-            byte[] tmp = new byte[AudioRecord.getMinBufferSize(44100, CHANNEL_IN_MONO, ENCODING_PCM_8BIT)];
-            //byte[] tmp = new byte[];
+            //byte[] tmp = new byte[AudioRecord.getMinBufferSize(8000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT)];
+            byte[] tmp = new byte[8000];
             //byte[] a = new byte[bufferSize];
+            Log.d(TAG, "pre loop");
+
             Log.d(TAG, Boolean.toString(recording));
             int tot = 0;
             ArrayList<byte[]> holder = new ArrayList<byte[]>();
             ArrayList<Integer> h2 = new ArrayList<Integer>();
+            //ArrayList<byte> h1 = new ArrayList<byte>();
+            //byte[] tmp = new byte[1024];
+            ArrayList<Byte> h3 = new ArrayList<Byte>();
+
 
             while (recording == true) {
                 int cur = 0;
 
                 //recorder.read(,buffer);
-                cur = recorder.read(tmp, 0, bufferSize);
-                Log.d("Write",Byte.toString(tmp[5]));
+                cur = recorder.read(tmp, 0, 8000);
+                Log.d("Write",Byte.toString(tmp[65]));
 
-                holder.add(tmp);
+                Log.d("Write",Integer.toString(cur));
+
+                for(int i =0;i< cur; i++)
+                {
+                    h3.add(tmp[i]);
+                }
+                //holder.add(tmp);
 
 
-                h2.add(cur);
-                tot += cur;
+                //h2.add(cur);
+                //tot += cur;
 
             }
 
 
 
             recorder.stop();
-            int place = 0;
-            byte[] a = new byte[tot];
+            Log.d("Write","check");
+
+            //int place = 0;
+            byte[] a = new byte[h3.size()];
+            for(int i = 0; i<h3.size(); i++)
+            {
+                a[i] = h3.get(i);
+            }
+            /*
             for(int i=0; i<holder.size();i++)
             {
                 byte[] tmp2;
@@ -242,12 +259,13 @@ public class MainActivity extends AppCompatActivity {
 
 
             }
+
             Log.d("Write",Integer.toString(place));
 
             Log.d("Write",Integer.toString(a.length));
 
             //writeToExternal();
-
+            */
             //d2 = a;
             Log.d("Write",Byte.toString(a[a.length/2]));
             Log.d("Write",Byte.toString(a[a.length/2+1]));
@@ -352,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Audio",Byte.toString(data[data.length/2+3]));
 
 
-            AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 44100,
+            AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 8000,
                     AudioFormat.CHANNEL_CONFIGURATION_MONO,AudioFormat.ENCODING_PCM_8BIT, data.length, AudioTrack.MODE_STATIC);
             audioTrack.write(data, 0, data.length);
 
