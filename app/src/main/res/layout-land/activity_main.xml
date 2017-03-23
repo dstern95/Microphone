@@ -17,15 +17,14 @@
         android:padding="5dp"
         android:layout_centerHorizontal="true" />
 
-    <ToggleButton
+    <ToggleButton android:id="@+id/t_button"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/imageView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:textOn="Recording..."
-        android:textOff="Record"
-        android:id="@+id/t_button" />
+        android:textOff="Record" />
 
 
 </RelativeLayout>

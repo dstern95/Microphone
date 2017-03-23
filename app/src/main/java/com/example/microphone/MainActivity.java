@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void showWorking(boolean on) {
-        View v = findViewById(R.id.activity_fib_tv_recording);
+        View v = findViewById(R.id.t_button);
         if (on) {
             v.setVisibility(View.VISIBLE);
             Animation a = AnimationUtils.loadAnimation(this, R.anim.blink_anim);
