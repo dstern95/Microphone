@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         //writeToExternal();
         //pmic();
 
+
         ToggleButton toggle = (ToggleButton) findViewById(R.id.t_button);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -104,30 +105,46 @@ public class MainActivity extends AppCompatActivity {
 
 
                 } else {
-                    Lock _mutex = new ReentrantLock(true);
 
-                    _mutex.lock();
-                    recording = false;
-
-
-                    _mutex.unlock();
-                    Log.d("Toggle", "toggle off");
-
-                    try {
-                        t.join();
-                    } catch (Exception e) {
-                        //exception
-                    }
-                    //showWorking(false);
-
-                    showWorking(false);
-                    Log.d(TAG, "thread ended");
+                    stoprecord();
                 }
+
+
             }
         });
     }
 
+    public void stoprecord(){
+        Lock _mutex = new ReentrantLock(true);
 
+        _mutex.lock();
+        recording = false;
+
+
+        _mutex.unlock();
+        Log.d("Toggle", "toggle off");
+
+        try {
+            t.join();
+        } catch (Exception e) {
+            //exception
+        }
+
+        showWorking(false);
+        Log.d(TAG, "thread ended");
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        if (recording == true){
+            stoprecord();
+
+        }
+
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -157,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void showWorking(boolean on) {
-        View v = findViewById(R.id.t_button);
+        View v = findViewById(R.id.activity_fib_tv_recording);
         if (on) {
             v.setVisibility(View.VISIBLE);
             Animation a = AnimationUtils.loadAnimation(this, R.anim.blink_anim);
