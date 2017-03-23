@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    showWorking(true);
                     int bufferSize = AudioRecord.getMinBufferSize(16000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT);
                     recorder = new AudioRecord(MIC, 8000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT, bufferSize);
                     Log.d("Toggle", "toggle on");
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     //showWorking(false);
 
+                    showWorking(false);
                     Log.d(TAG, "thread ended");
                 }
             }
@@ -153,20 +155,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    /*
+
     private void showWorking(boolean on) {
-        View v = findViewById(R.id.imageView);
+        View v = findViewById(R.id.activity_fib_tv_recording);
         if (on) {
             v.setVisibility(View.VISIBLE);
             Animation a = AnimationUtils.loadAnimation(this, R.anim.blink_anim);
-            v.setAnimation(a);
-            v.animate();
+            v.startAnimation(a);
         } else {
-            v.setVisibility(View.VISIBLE);
+            v.setVisibility(View.INVISIBLE);
             v.clearAnimation();
         }
     }
-    */
+
 
     public void pmic() {
         String[] perms = new String[]{Manifest.permission.RECORD_AUDIO};

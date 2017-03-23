@@ -26,6 +26,15 @@
         android:textOn="Recording..."
         android:textOff="Record"
         android:id="@+id/t_button" />
+    <TextView android:id="@+id/activity_fib_tv_recording"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/t_button"
+
+        android:text="recording..."
+        android:visibility="invisible"/>
 
 
 </RelativeLayout>
