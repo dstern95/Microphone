@@ -120,17 +120,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "thread ended");
     }
 
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
 
-        if (recording == true){
-            stoprecord();
-
-        }
-
-    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -203,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "pre loop");
 
             Log.d(TAG, Boolean.toString(recording));
-            int tot = 0;
 
 
             ArrayList<Byte> h3 = new ArrayList<Byte>();
@@ -212,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
             while (recording == true) {
                 int cur = 0;
 
-                //recorder.read(,buffer);
                 cur = recorder.read(tmp, 0, 8000);
                 Log.d("Write",Byte.toString(tmp[65]));
 
@@ -222,11 +210,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     h3.add(tmp[i]);
                 }
-                //holder.add(tmp);
 
-
-                //h2.add(cur);
-                //tot += cur;
 
             }
 
