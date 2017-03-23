@@ -202,10 +202,8 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d(TAG, Boolean.toString(recording));
             int tot = 0;
-            ArrayList<byte[]> holder = new ArrayList<byte[]>();
-            ArrayList<Integer> h2 = new ArrayList<Integer>();
-            //ArrayList<byte> h1 = new ArrayList<byte>();
-            //byte[] tmp = new byte[1024];
+
+
             ArrayList<Byte> h3 = new ArrayList<Byte>();
 
 
