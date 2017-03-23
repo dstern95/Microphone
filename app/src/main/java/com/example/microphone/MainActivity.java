@@ -282,8 +282,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.menu_save:
-                externalStorage();
-                Toast.makeText(this, "Saving Audio...", Toast.LENGTH_LONG).show();
+                if (data!=null) {
+                    if (recording == false) {
+                        externalStorage();
+                        Toast.makeText(this, "Saving Audio...", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "Stop Recording First", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+                else
+                {
+                    Toast.makeText(this, "Record something first", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             case R.id.menu_view:
                 Intent i = new Intent(this, viewsaved.class);
