@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     public void stoprecord(){
         Lock _mutex = new ReentrantLock(true);
 
@@ -121,6 +122,15 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "thread ended");
     }
 
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        ToggleButton toggle = (ToggleButton) findViewById(R.id.t_button);
+        toggle.setChecked(false);
+
+
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
