@@ -22,6 +22,8 @@ public class viewsaved extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getName();
 
+    String[] fileArray;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +36,15 @@ public class viewsaved extends AppCompatActivity {
         File loc = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "mic_recording_ds_md");
         File[] files = loc.listFiles();
 
-        String[] fileArray = new String[files.length];
+        if (files != null) {
+            fileArray = new String[files.length];
 
-        for (int i=0; i < fileArray.length; i++) {
-            fileArray[i] = files[i].getName();
+            for (int i = 0; i < fileArray.length; i++) {
+                fileArray[i] = files[i].getName();
+            }
+        }
+        else {
+            fileArray = new String[0];
         }
 
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileArray);
