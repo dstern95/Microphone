@@ -254,13 +254,12 @@ public class MainActivity extends AppCompatActivity {
 
         //loc.mkdirs();
         file.mkdir();
+        Timestamp time1 = new Timestamp(System.currentTimeMillis());
 
-        long time = System.currentTimeMillis()/10000;
-        String timestamp = Long.toString(time) + ".pcm";
+        String timestamp = time1.toString() + ".pcm";
         Log.d(TAG, timestamp);
 
-        Timestamp time1 = new Timestamp(System.currentTimeMillis());
-        timestamp =time1.toString();
+
         //File f = new File(loc, timestamp);
         File f = new File(file, timestamp);
         FileOutputStream fos;
