@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     showWorking(true);
+                    buttonView.setBackgroundResource(R.drawable.roundbuttonon);
                     int bufferSize = AudioRecord.getMinBufferSize(16000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT);
                     recorder = new AudioRecord(MIC, 8000, CHANNEL_IN_MONO, ENCODING_PCM_8BIT, bufferSize);
                     Log.d("Toggle", "toggle on");
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 } else {
-
+                    buttonView.setBackgroundResource(R.drawable.roundbutton);
                     stoprecord();
                 }
 
