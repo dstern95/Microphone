@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
+
         //recording= false;
 
         //writeToExternal();
@@ -239,34 +240,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 a[i] = h3.get(i);
             }
-            /*
-            for(int i=0; i<holder.size();i++)
-            {
-                byte[] tmp2;
 
-                tmp2 = holder.get(i);
-                //Log.d("Write",Byte.toString(tmp2[0]));
-
-
-                for(int x=0; x<h2.get(i);x++)
-                {
-                    //Log.d("Write",Byte.toString(tmp2[x]));
-                    //Log.d("Write",Integer.toString(place));
-
-                    a[place] = tmp2[x];
-                    place++;
-                }
-
-
-            }
-
-            Log.d("Write",Integer.toString(place));
-
-            Log.d("Write",Integer.toString(a.length));
-
-            //writeToExternal();
-            */
-            //d2 = a;
             Log.d("Write",Byte.toString(a[a.length/2]));
             Log.d("Write",Byte.toString(a[a.length/2+1]));
             Log.d("Write",Byte.toString(a[a.length/2+2]));
@@ -274,8 +248,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             data = a;
+            writeToExternal();
 
-            //data = a.toString().getBytes();
 
             Log.d(TAG, "post loop");
 
@@ -294,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
 
         //loc.mkdirs();
         file.mkdir();
-        //File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), albumName);
 
         long time = System.currentTimeMillis()/10000;
         String timestamp = Long.toString(time) + ".pcm";
@@ -380,31 +353,4 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Audio","Playback Failed");
         }
     }
-/*
-    private void playMp3(byte[] mp3SoundByteArray)
-    {
-        try
-        {
-            File path=new File(getCacheDir()+"/musicfile.3gp");
-
-            FileOutputStream fos = new FileOutputStream(path);
-            fos.write(mp3SoundByteArray);
-            fos.close();
-
-
-            MediaPlayer mediaPlayer = new MediaPlayer();
-
-            FileInputStream fis = new FileInputStream(path);
-            mediaPlayer.setDataSource(getCacheDir()+"/musicfile.3gp");
-
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        }
-        catch (IOException ex)
-        {
-            String s = ex.toString();
-            ex.printStackTrace();
-        }
-    }
-    */
 }
