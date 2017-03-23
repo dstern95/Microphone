@@ -41,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import java.util.concurrent.locks.Lock;
@@ -257,6 +258,9 @@ public class MainActivity extends AppCompatActivity {
         long time = System.currentTimeMillis()/10000;
         String timestamp = Long.toString(time) + ".pcm";
         Log.d(TAG, timestamp);
+
+        Timestamp time1 = new Timestamp(System.currentTimeMillis());
+        timestamp =time1.toString();
         //File f = new File(loc, timestamp);
         File f = new File(file, timestamp);
         FileOutputStream fos;
